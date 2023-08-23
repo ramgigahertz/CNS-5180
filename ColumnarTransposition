@@ -1,0 +1,60 @@
+#include <stdio.h>
+#include <string.h>
+#define MAX_ROWS 100
+#define MAX_COLS 100
+void encryptColumnarTransposition(const char *plaintext, const char *key) {
+    int keyLength = strlen(key);
+    int textLength = strlen(plaintext);
+    int rows = textLength / keyLength;
+    if (textLength % keyLength != 0) {
+        rows++;
+    }
+    char grid[MAX_ROWS][MAX_COLS];
+    int row = 0, col = 0;
+    for (int i = 0; i < textLength; i++) {
+        grid[row][col] = plaintext[i];
+        col++;
+        if (col == keyLength) {
+            col = 0;
+            row++;
+        }
+    }
+    while (col < keyLength) {
+        grid[row][col] = 'X';
+        col++;
+    }
+    int order[MAX_COLS];
+    for (int i = 0; i < keyLength; i++) {
+        order[i] = i;
+    }
+    for (int i = 0; i < keyLength; i++) {
+        for (int j = i + 1; j < keyLength; j++) {
+            if (key[order[j]] < key[order[i]]) {
+                int temp = order[i];
+                order[i] = order[j];
+                order[j] = temp;
+            }
+        }
+    }
+    printf("encrypted pt = ");
+    for (int i = 0; i < keyLength; i++) {
+        for (int r = 0; r < rows; r++) {
+            if (grid[r][order[i]] != 'X') {
+                printf("%c", grid[r][order[i]]);
+            }
+        }
+    }
+    printf("\n");
+}
+int main() {
+    char plaintext[1000];
+    char key[100];
+    printf("enter pt= ");
+    fgets(plaintext, sizeof(plaintext), stdin);
+    plaintext[strcspn(plaintext, "\n")] = '\0'; 
+    printf("enter key= ");
+    fgets(key, sizeof(key), stdin);
+    key[strcspn(key, "\n")] = '\0'; 
+    encryptColumnarTransposition(plaintext, key);
+    return 0;
+}
